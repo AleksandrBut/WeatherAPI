@@ -4,8 +4,9 @@ import (
 	"WeatherAPI/model"
 	"context"
 	"github.com/jackc/pgx/v5/pgxpool"
-	_ "github.com/joho/godotenv/autoload"
 	"os"
+
+	_ "github.com/joho/godotenv/autoload"
 )
 
 var pool *pgxpool.Pool

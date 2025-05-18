@@ -1,6 +1,7 @@
 package main
 
 import (
+	"WeatherAPI/client"
 	"WeatherAPI/db"
 	"WeatherAPI/model"
 	"encoding/json"
@@ -56,6 +57,7 @@ func test(w http.ResponseWriter, r *http.Request) {
 	subscription, err = db.CreateSubscription(subscription)
 
 	if err != nil {
+		//TODO replace with http.Error
 		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = w.Write([]byte("DB error"))
 
@@ -74,7 +76,24 @@ func test(w http.ResponseWriter, r *http.Request) {
 }
 
 func getWeatherByCity(w http.ResponseWriter, r *http.Request) {
-	_, _ = w.Write([]byte("Test weather response"))
+	cityName := r.URL.Query().Get("city")
+
+	if cityName == "" {
+		http.Error(w, "Request parameter 'city' must be specified", http.StatusBadRequest)
+		return
+	}
+
+	weather, err := client.GetWeatherByCity(cityName)
+
+	if err != nil {
+		http.Error(w, "Error while requesting external Weather API", http.StatusBadGateway)
+		return
+	}
+
+	if err = json.NewEncoder(w).Encode(&weather); err != nil {
+		http.Error(w, "Could not encode response body", http.StatusInternalServerError)
+		return
+	}
 }
 
 func subscribeToWeatherUpdates(w http.ResponseWriter, r *http.Request) {
