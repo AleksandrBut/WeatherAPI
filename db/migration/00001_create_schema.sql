@@ -5,7 +5,7 @@ create type frequency_type as enum ('hourly', 'daily');
 create table subscription
 (
     id        serial primary key,
-    cityName  varchar(255)   not null,
+    city_name  varchar(255)   not null,
     email     varchar(255)   not null,
     frequency frequency_type not null,
     token     varchar(255),

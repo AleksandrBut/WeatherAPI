@@ -1,13 +1,13 @@
 package model
 
-const hourly = "hourly"
-const daily = "daily"
+const Hourly = "hourly"
+const Daily = "daily"
 
 func IsSubscriptionValid(subscription *Subscription) bool {
 	return subscription.CityName != "" &&
 		subscription.Email != "" &&
 		subscription.Frequency != "" &&
-		(subscription.Frequency == hourly || subscription.Frequency == daily)
+		(subscription.Frequency == Hourly || subscription.Frequency == Daily)
 }
 
 func IsConfirmationTokenValid(token *string) bool {

@@ -23,7 +23,7 @@ func CreateConnectionPool() {
 func CreateSubscription(subscription *model.Subscription) error {
 	_, err := pool.Exec(
 		context.Background(),
-		"insert into subscription(cityname, email, frequency, token) values ($1, $2, $3, $4)",
+		"insert into subscription(city_name, email, frequency, token) values ($1, $2, $3, $4)",
 		subscription.CityName,
 		subscription.Email,
 		subscription.Frequency,
@@ -78,4 +78,42 @@ func DeleteSubscriptionById(id *int) error {
 	)
 
 	return err
+}
+
+func GetActiveSubscriptions(frequency string) ([]model.Subscription, error) {
+	rows, err := pool.Query(
+		context.Background(),
+		"select id, city_name, email, token, frequency from subscription where is_active = true and frequency = $1",
+		frequency,
+	)
+
+	defer rows.Close()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var subscriptions []model.Subscription
+
+	for rows.Next() {
+		var subscription model.Subscription
+
+		if err = rows.Scan(
+			&subscription.Id,
+			&subscription.CityName,
+			&subscription.Email,
+			&subscription.Token,
+			&subscription.Frequency,
+		); err != nil {
+			return nil, err
+		}
+
+		subscriptions = append(subscriptions, subscription)
+	}
+
+	if rows.Err() != nil {
+		return nil, err
+	}
+
+	return subscriptions, nil
 }

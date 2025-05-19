@@ -13,6 +13,8 @@ func main() {
 	db.CreateConnectionPool()
 	defer db.CloseConnectionPool()
 
+	service.InitScheduler()
+
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
