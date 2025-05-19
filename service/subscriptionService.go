@@ -5,6 +5,7 @@ import (
 	"WeatherAPI/db"
 	"WeatherAPI/model"
 	"WeatherAPI/token"
+	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
 )
@@ -16,14 +17,14 @@ func SubscribeToWeatherUpdates(w http.ResponseWriter, r *http.Request) {
 	subscription.Email = r.FormValue("email")
 	subscription.Frequency = r.FormValue("frequency")
 
-	if !model.IsSubscriptionValid(subscription) {
+	if !model.IsSubscriptionValid(&subscription) {
 		log.Println("Invalid input for subscription: ", subscription)
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 
 		return
 	}
 
-	if db.IsEmailAlreadySubscribed(subscription.Email) {
+	if db.IsEmailAlreadySubscribed(&subscription.Email) {
 		log.Println("Email ", subscription.Email, " is already subscribed")
 		http.Error(w, "Email already subscribed", http.StatusConflict)
 
@@ -40,10 +41,42 @@ func SubscribeToWeatherUpdates(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = db.CreateSubscription(subscription)
+	err = db.CreateSubscription(&subscription)
 
 	if err != nil {
 		log.Println(err)
+		http.Error(w, "DB error", http.StatusInternalServerError)
+	}
+}
+
+func ConfirmEmailSubscription(w http.ResponseWriter, r *http.Request) {
+	confirmationToken := chi.URLParam(r, "token")
+
+	if !model.IsConfirmationTokenValid(&confirmationToken) {
+		log.Println("Invalid token ", confirmationToken)
+		http.Error(w, "Invalid token", http.StatusBadRequest)
+
+		return
+	}
+
+	subscriptionId, err := db.GetSubscriptionIdByToken(&confirmationToken)
+
+	if subscriptionId == 0 {
+		log.Println("Token not found ", confirmationToken)
+		http.Error(w, "Token not found", http.StatusNotFound)
+
+		return
+	}
+
+	if err != nil {
+		log.Println("DB error")
+		http.Error(w, "DB error", http.StatusInternalServerError)
+
+		return
+	}
+
+	if err = db.SetSubscriptionActiveById(&subscriptionId); err != nil {
+		log.Println("DB error")
 		http.Error(w, "DB error", http.StatusInternalServerError)
 	}
 }

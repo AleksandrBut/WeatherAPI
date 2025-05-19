@@ -45,7 +45,7 @@ func subscribeToWeatherUpdates(w http.ResponseWriter, r *http.Request) {
 }
 
 func confirmEmailSubscription(w http.ResponseWriter, r *http.Request) {
-
+	service.ConfirmEmailSubscription(w, r)
 }
 
 func unsubscribeFromWeatherUpdates(w http.ResponseWriter, r *http.Request) {

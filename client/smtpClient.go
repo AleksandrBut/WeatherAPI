@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const confirmSubscriptionBaseUrl = "http://localhost:8080/api/confirm?token="
+const confirmSubscriptionBaseUrl = "http://localhost:8080/api/confirm/"
 const emailSubjectPart = "Subject: Weather update confirmation\n\n"
 const emailHiPart = "Hi!\n\nYou are going to subscribe to weather updates in "
 const emailOnPart = " on "
