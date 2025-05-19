@@ -9,7 +9,7 @@ create table subscription
     email     varchar(255)   not null,
     frequency frequency_type not null,
     token     varchar(255),
-    isActive  bool           not null default false
+    is_active  bool           not null default false
 );
 -- +goose StatementEnd
 
