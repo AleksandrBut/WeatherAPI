@@ -4,6 +4,7 @@ import (
 	"WeatherAPI/model"
 	"context"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"log"
 	"os"
 
 	_ "github.com/joho/godotenv/autoload"
@@ -13,6 +14,10 @@ var pool *pgxpool.Pool
 
 func CreateConnectionPool() {
 	pool, _ = pgxpool.New(context.Background(), os.Getenv("GOOSE_DBSTRING"))
+
+	if err := pool.Ping(context.Background()); err != nil {
+		log.Fatal("Could not connect to database: ", err)
+	}
 }
 
 func CreateSubscription(subscription model.Subscription) (model.Subscription, error) {
