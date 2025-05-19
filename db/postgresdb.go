@@ -57,7 +57,8 @@ func GetSubscriptionIdByToken(token *string) (int, error) {
 }
 
 func SetSubscriptionActiveById(id *int) error {
-	_, err := pool.Exec(context.Background(),
+	_, err := pool.Exec(
+		context.Background(),
 		"update subscription set is_active = true where id = $1",
 		id,
 	)
@@ -67,4 +68,14 @@ func SetSubscriptionActiveById(id *int) error {
 
 func CloseConnectionPool() {
 	pool.Close()
+}
+
+func DeleteSubscriptionById(id *int) error {
+	_, err := pool.Exec(
+		context.Background(),
+		"delete from subscription where id = $1",
+		id,
+	)
+
+	return err
 }
