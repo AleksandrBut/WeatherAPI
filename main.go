@@ -39,17 +39,21 @@ func api() http.Handler {
 }
 
 func getWeatherByCity(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
 	service.GetWeatherByCity(w, r)
 }
 
 func subscribeToWeatherUpdates(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
 	service.SubscribeToWeatherUpdates(w, r)
 }
 
 func confirmEmailSubscription(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
 	service.ConfirmEmailSubscription(w, r)
 }
 
 func unsubscribeFromWeatherUpdates(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
 	service.Unsubscribe(w, r)
 }
