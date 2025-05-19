@@ -20,20 +20,28 @@ func CreateConnectionPool() {
 	}
 }
 
-func CreateSubscription(subscription model.Subscription) (model.Subscription, error) {
-	err := pool.QueryRow(
+func CreateSubscription(subscription model.Subscription) error {
+	_, err := pool.Exec(
 		context.Background(),
-		"insert into subscription(cityname, email, frequency) values ($1, $2, $3) returning id",
+		"insert into subscription(cityname, email, frequency, token) values ($1, $2, $3, $4)",
 		subscription.CityName,
 		subscription.Email,
 		subscription.Frequency,
-	).Scan(&subscription.Id)
+		subscription.Token,
+	)
 
-	if err != nil {
-		return model.Subscription{}, err
-	}
+	return err
+}
 
-	return subscription, nil
+func IsEmailAlreadySubscribed(email string) bool {
+	var exists bool
+	_ = pool.QueryRow(
+		context.Background(),
+		"select exists (select 1 from subscription where email = $1) ",
+		email,
+	).Scan(&exists)
+
+	return exists
 }
 
 func CloseConnectionPool() {
