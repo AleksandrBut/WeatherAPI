@@ -39,6 +39,7 @@ func api() http.Handler {
 	return r
 }
 
+// TODO replace Write with Render
 func test(w http.ResponseWriter, r *http.Request) {
 	var subscription model.Subscription
 
@@ -86,7 +87,7 @@ func getWeatherByCity(w http.ResponseWriter, r *http.Request) {
 	weather, err := client.GetWeatherByCity(cityName)
 
 	if err != nil {
-		http.Error(w, "Error while requesting external Weather API", http.StatusBadGateway)
+		http.Error(w, "Error while requesting external Weather API: "+err.Error(), http.StatusBadGateway)
 		return
 	}
 

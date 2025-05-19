@@ -3,6 +3,7 @@ package client
 import (
 	"WeatherAPI/model"
 	"encoding/json"
+	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -52,18 +53,34 @@ func GetWeatherByCity(cityName string) (model.Weather, error) {
 		}
 	}(response.Body)
 
-	var externalWeatherResponse model.ExternalWeatherResponse
-	decoder := json.NewDecoder(response.Body)
-	err = decoder.Decode(&externalWeatherResponse)
+	switch response.StatusCode {
+	case http.StatusOK:
+		var externalWeatherResponse model.ExternalWeatherResponse
+		decoder := json.NewDecoder(response.Body)
+		err = decoder.Decode(&externalWeatherResponse)
 
-	if err != nil {
-		log.Println("Error while decoding external Weather API response", err)
-		return model.Weather{}, err
+		if err != nil {
+			log.Println("Error while decoding external Weather API response", err)
+			return model.Weather{}, err
+		}
+
+		return model.Weather{
+			Temperature: externalWeatherResponse.Current.TempC,
+			Humidity:    externalWeatherResponse.Current.Humidity,
+			Description: externalWeatherResponse.Current.Condition.Text,
+		}, nil
+	case http.StatusBadRequest:
+		var externalWeatherErrorResponse model.ExternalWeatherErrorResponse
+		decoder := json.NewDecoder(response.Body)
+		err = decoder.Decode(&externalWeatherErrorResponse)
+
+		if err != nil {
+			log.Println("Error while decoding external Weather API error response", err)
+			return model.Weather{}, err
+		}
+
+		return model.Weather{}, errors.New(externalWeatherErrorResponse.Error.Message)
+	default:
+		return model.Weather{}, errors.New("unexpected external Weather API response")
 	}
-
-	return model.Weather{
-		Temperature: externalWeatherResponse.Current.TempC,
-		Humidity:    externalWeatherResponse.Current.Humidity,
-		Description: externalWeatherResponse.Current.Condition.Text,
-	}, nil
 }

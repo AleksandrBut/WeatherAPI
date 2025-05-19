@@ -5,6 +5,8 @@ type Subscription struct {
 	CityName  string `json:"cityName,omitempty"`
 	Email     string `json:"email,omitempty"`
 	Frequency string `json:"frequency,omitempty"`
+	Token     string
+	IsActive  bool
 }
 
 type Weather struct {
@@ -21,4 +23,11 @@ type ExternalWeatherResponse struct {
 		} `json:"condition"`
 		Humidity int `json:"humidity"`
 	} `json:"current"`
+}
+
+type ExternalWeatherErrorResponse struct {
+	Error struct {
+		Code    int    `json:"code,omitempty"`
+		Message string `json:"message,omitempty"`
+	} `json:"error"`
 }
